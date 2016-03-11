@@ -1,0 +1,24 @@
+2016-03-01 17:49:18,327 - converter-log - DEBUG - Reading source file:test/bigip.conf
+2016-03-01 17:49:18,705 - converter-log - DEBUG - Parsing complete...
+2016-03-01 17:49:18,705 - converter-log - INFO - Parse Unmatched String: ltm rule /Common/SNAT-to-XFF {
+    when HTTP_REQUEST {
+   if { [HTTP::header exists X-Forwarded-For] } {
+      snat [HTTP::header X-Forwarded-For]
+   }
+}
+}
+2016-03-01 17:49:18,707 - converter-log - DEBUG - File Parsed successfully
+2016-03-01 17:49:18,707 - converter-log - DEBUG - Converted health monitors
+2016-03-01 17:49:18,708 - converter-log - DEBUG - Converted pools
+2016-03-01 17:49:18,708 - converter-log - ERROR - Error to read file.certs/default.key
+2016-03-01 17:49:18,708 - converter-log - ERROR - Error to read file.certs/default.crt
+2016-03-01 17:49:18,708 - converter-log - ERROR - Error to read file.certs/default.key
+2016-03-01 17:49:18,708 - converter-log - ERROR - Error to read file.certs/default.crt
+2016-03-01 17:49:18,708 - converter-log - ERROR - Error to read file.certs/default.key
+2016-03-01 17:49:18,708 - converter-log - ERROR - Error to read file.certs/default.crt
+2016-03-01 17:49:18,708 - converter-log - ERROR - Error to read file.certs/default.key
+2016-03-01 17:49:18,708 - converter-log - ERROR - Error to read file.certs/default.crt
+2016-03-01 17:49:18,708 - converter-log - DEBUG - Converted ssl profiles
+2016-03-01 17:49:18,708 - converter-log - DEBUG - Converted VS
+2016-03-01 17:49:18,724 - converter-log - DEBUG - Conversion started
+2016-03-01 17:49:18,726 - converter-log - INFO - writtent avi config file .Output.json

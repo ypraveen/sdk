@@ -1,0 +1,7 @@
+ltm rule /Common/SNAT-to-XFF {
+    when HTTP_REQUEST {
+   if { [HTTP::header exists X-Forwarded-For] } {
+      snat [HTTP::header X-Forwarded-For]
+   }
+}
+}

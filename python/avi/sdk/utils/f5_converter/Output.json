@@ -1,0 +1,444 @@
+{
+    "VirtualService": [
+        {
+            "ssl_key_and_certificate_refs": [
+                "admin:F5-SSL-ClientSSL-003"
+            ], 
+            "pool_ref": "admin:F5-Pool-002:Default-Cloud", 
+            "name": "F5-VIP-443-004", 
+            "services": [
+                {
+                    "enable_ssl": true, 
+                    "port": "443"
+                }
+            ], 
+            "ip_address": {
+                "type": "V4", 
+                "addr": "192.168.38.25"
+            }, 
+            "type": "VS_TYPE_NORMAL", 
+            "application_profile_name": "System-Secure-HTTP", 
+            "enabled": true, 
+            "ssl_profile_name": "System-Standard"
+        }, 
+        {
+            "pool_ref": "admin:F5-Pool-001:Default-Cloud", 
+            "name": "F5-VIP-80-001", 
+            "services": [
+                {
+                    "enable_ssl": false, 
+                    "port": "80"
+                }
+            ], 
+            "ip_address": {
+                "type": "V4", 
+                "addr": "192.168.38.20"
+            }, 
+            "type": "VS_TYPE_NORMAL", 
+            "application_profile_name": "System-HTTP", 
+            "enabled": true, 
+            "ssl_profile_name": "System-Standard"
+        }, 
+        {
+            "ssl_key_and_certificate_refs": [
+                "admin:EngSSLProfile"
+            ], 
+            "pool_ref": "admin:testpool:Default-Cloud", 
+            "name": "EngVIP", 
+            "services": [
+                {
+                    "enable_ssl": true, 
+                    "port": "80"
+                }
+            ], 
+            "ip_address": {
+                "type": "V4", 
+                "addr": "172.1.1.1"
+            }, 
+            "type": "VS_TYPE_NORMAL", 
+            "application_profile_name": "System-Secure-HTTP", 
+            "enabled": true, 
+            "ssl_profile_name": "System-Standard"
+        }, 
+        {
+            "pool_ref": "admin:testpool:Default-Cloud", 
+            "name": "testvip-http-80", 
+            "services": [
+                {
+                    "enable_ssl": false, 
+                    "port": "80"
+                }
+            ], 
+            "ip_address": {
+                "type": "V4", 
+                "addr": "10.90.114.121"
+            }, 
+            "type": "VS_TYPE_NORMAL", 
+            "application_profile_name": "System-HTTP", 
+            "enabled": true, 
+            "ssl_profile_name": "System-Standard"
+        }, 
+        {
+            "ssl_key_and_certificate_refs": [
+                "admin:F5-SSL-ClientSSL-001"
+            ], 
+            "pool_ref": "admin:F5-Pool-002:Default-Cloud", 
+            "name": "F5-VIP-443-001", 
+            "services": [
+                {
+                    "enable_ssl": true, 
+                    "port": "443"
+                }
+            ], 
+            "ip_address": {
+                "type": "V4", 
+                "addr": "192.168.38.21"
+            }, 
+            "type": "VS_TYPE_NORMAL", 
+            "application_profile_name": "System-Secure-HTTP", 
+            "enabled": true, 
+            "ssl_profile_name": "System-Standard"
+        }, 
+        {
+            "ssl_key_and_certificate_refs": [
+                "admin:F5-SSL-ClientSSL-003"
+            ], 
+            "pool_ref": "admin:F5-Pool-004:Default-Cloud", 
+            "name": "F5-VIP-443-002", 
+            "services": [
+                {
+                    "enable_ssl": true, 
+                    "port": "443"
+                }
+            ], 
+            "ip_address": {
+                "type": "V4", 
+                "addr": "192.168.38.22"
+            }, 
+            "type": "VS_TYPE_NORMAL", 
+            "application_profile_name": "System-Secure-HTTP", 
+            "enabled": true, 
+            "ssl_profile_name": "System-Standard"
+        }, 
+        {
+            "ssl_key_and_certificate_refs": [
+                "admin:System-Default-Cert"
+            ], 
+            "pool_ref": "admin:testpool:Default-Cloud", 
+            "name": "testvip", 
+            "services": [
+                {
+                    "enable_ssl": true, 
+                    "port": "443"
+                }
+            ], 
+            "ip_address": {
+                "type": "V4", 
+                "addr": "10.90.114.121"
+            }, 
+            "type": "VS_TYPE_NORMAL", 
+            "application_profile_name": "System-Secure-HTTP", 
+            "enabled": true, 
+            "ssl_profile_name": "System-Standard"
+        }
+    ], 
+    "HealthMonitor": [
+        {
+            "receive_timeout": 4, 
+            "name": "F5-Monitor-HTTP-001", 
+            "failed_checks": 1, 
+            "send_interval": 5, 
+            "http_monitor": {
+                "http_request": "HEAD / HTTP/1.0", 
+                "http_response_code": [
+                    {
+                        "code": "HTTP_2XX"
+                    }, 
+                    {
+                        "code": "HTTP_3XX"
+                    }
+                ]
+            }, 
+            "type": "HEALTH_MONITOR_HTTP", 
+            "successful_checks": 3
+        }, 
+        {
+            "receive_timeout": 29, 
+            "name": "F5-Monitor-ICMP-001", 
+            "failed_checks": 1, 
+            "send_interval": 30, 
+            "type": "HEALTH_MONITOR_PING", 
+            "successful_checks": 3
+        }, 
+        {
+            "receive_timeout": 4, 
+            "name": "EngMonitor", 
+            "failed_checks": 1, 
+            "send_interval": 5, 
+            "http_monitor": {
+                "http_request": "HEAD / HTTP/1.0", 
+                "http_response_code": [
+                    {
+                        "code": "HTTP_2XX"
+                    }, 
+                    {
+                        "code": "HTTP_3XX"
+                    }
+                ]
+            }, 
+            "type": "HEALTH_MONITOR_HTTP", 
+            "successful_checks": 3
+        }, 
+        {
+            "receive_timeout": 59, 
+            "name": "F5-Monitor-TCP-001", 
+            "failed_checks": 1, 
+            "send_interval": 60, 
+            "type": "HEALTH_MONITOR_TCP", 
+            "successful_checks": 2
+        }, 
+        {
+            "receive_timeout": 4, 
+            "description": "F5-Monitor-UDP-001", 
+            "failed_checks": 1, 
+            "tcp_monitor": {
+                "udp_request": "default send string", 
+                "udp_response": "Test"
+            }, 
+            "send_interval": 5, 
+            "successful_checks": 3, 
+            "type": "HEALTH_MONITOR_UDP", 
+            "name": "F5-Monitor-UDP-001"
+        }, 
+        {
+            "https_monitor": {
+                "http_request": "HEAD / HTTP/1.0", 
+                "http_response_code": [
+                    {
+                        "code": "HTTP_2XX"
+                    }, 
+                    {
+                        "code": "HTTP_3XX"
+                    }
+                ]
+            }, 
+            "receive_timeout": 4, 
+            "name": "F5-Monitor-HTTPS-001", 
+            "failed_checks": 1, 
+            "send_interval": 5, 
+            "type": "HEALTH_MONITOR_HTTPS", 
+            "successful_checks": 3
+        }
+    ], 
+    "Pool": [
+        {
+            "health_monitor_refs": [
+                "admin:F5-Monitor-ICMP-001"
+            ], 
+            "pd_action_type": "POOL_DOWN_ACTION_CLOSE_CONN", 
+            "name": "F5-Pool-002", 
+            "servers": [
+                {
+                    "ip": {
+                        "type": "V4", 
+                        "addr": "192.168.39.31"
+                    }, 
+                    "enabled": true, 
+                    "port": "80"
+                }, 
+                {
+                    "ip": {
+                        "type": "V4", 
+                        "addr": "192.168.39.30"
+                    }, 
+                    "enabled": true, 
+                    "port": "80"
+                }
+            ]
+        }, 
+        {
+            "health_monitor_refs": [
+                "admin:F5-Monitor-HTTPS-001", 
+                "admin:F5-Monitor-TCP-001", 
+                "admin:F5-Monitor-ICMP-001", 
+                "admin:System-Ping"
+            ], 
+            "pd_action_type": "POOL_DOWN_ACTION_CLOSE_CONN", 
+            "name": "F5-Pool-003", 
+            "servers": [
+                {
+                    "ip": {
+                        "type": "V4", 
+                        "addr": "10.90.115.10"
+                    }, 
+                    "enabled": true, 
+                    "port": "80"
+                }, 
+                {
+                    "ip": {
+                        "type": "V4", 
+                        "addr": "192.168.40.30"
+                    }, 
+                    "enabled": true, 
+                    "port": "80"
+                }
+            ]
+        }, 
+        {
+            "health_monitor_refs": [
+                "admin:F5-Monitor-HTTP-001"
+            ], 
+            "pd_action_type": "POOL_DOWN_ACTION_CLOSE_CONN", 
+            "name": "F5-Pool-001", 
+            "servers": [
+                {
+                    "ip": {
+                        "type": "V4", 
+                        "addr": "192.168.39.14"
+                    }, 
+                    "enabled": true, 
+                    "port": "80"
+                }, 
+                {
+                    "ip": {
+                        "type": "V4", 
+                        "addr": "10.90.115.10"
+                    }, 
+                    "enabled": true, 
+                    "port": "80"
+                }, 
+                {
+                    "ip": {
+                        "type": "V4", 
+                        "addr": "10.90.115.11"
+                    }, 
+                    "enabled": true, 
+                    "port": "80"
+                }, 
+                {
+                    "ip": {
+                        "type": "V4", 
+                        "addr": "192.168.38.11"
+                    }, 
+                    "enabled": true, 
+                    "port": "80"
+                }, 
+                {
+                    "ip": {
+                        "type": "V4", 
+                        "addr": "192.168.38.10"
+                    }, 
+                    "enabled": false, 
+                    "port": "80"
+                }
+            ]
+        }, 
+        {
+            "health_monitor_refs": [
+                "admin:System-HTTP", 
+                "admin:System-Ping"
+            ], 
+            "pd_action_type": "POOL_DOWN_ACTION_CLOSE_CONN", 
+            "name": "testpool", 
+            "servers": [
+                {
+                    "ip": {
+                        "type": "V4", 
+                        "addr": "10.90.115.10"
+                    }, 
+                    "enabled": true, 
+                    "port": "80"
+                }, 
+                {
+                    "ip": {
+                        "type": "V4", 
+                        "addr": "10.90.115.11"
+                    }, 
+                    "enabled": true, 
+                    "port": "80"
+                }
+            ]
+        }, 
+        {
+            "health_monitor_refs": [
+                "admin:F5-Monitor-UDP-001", 
+                "admin:System-Ping"
+            ], 
+            "pd_action_type": "POOL_DOWN_ACTION_CLOSE_CONN", 
+            "name": "F5-Pool-004", 
+            "servers": [
+                {
+                    "ip": {
+                        "type": "V4", 
+                        "addr": "10.90.115.11"
+                    }, 
+                    "enabled": true, 
+                    "port": "443"
+                }, 
+                {
+                    "ip": {
+                        "type": "V4", 
+                        "addr": "10.90.115.10"
+                    }, 
+                    "enabled": true, 
+                    "port": "443"
+                }
+            ]
+        }, 
+        {
+            "pd_action_type": "POOL_DOWN_ACTION_CLOSE_CONN", 
+            "name": "F5-Pool-005", 
+            "servers": [
+                {
+                    "ip": {
+                        "type": "V4", 
+                        "addr": "10.90.115.10"
+                    }, 
+                    "enabled": true, 
+                    "port": "80"
+                }, 
+                {
+                    "ip": {
+                        "type": "V4", 
+                        "addr": "10.90.115.11"
+                    }, 
+                    "enabled": false, 
+                    "port": "80"
+                }, 
+                {
+                    "ip": {
+                        "type": "V4", 
+                        "addr": "192.168.39.30"
+                    }, 
+                    "enabled": true, 
+                    "port": "80"
+                }, 
+                {
+                    "ip": {
+                        "type": "V4", 
+                        "addr": "192.168.38.10"
+                    }, 
+                    "enabled": true, 
+                    "port": "80"
+                }, 
+                {
+                    "ip": {
+                        "type": "V4", 
+                        "addr": "192.168.40.30"
+                    }, 
+                    "enabled": true, 
+                    "port": "80"
+                }, 
+                {
+                    "ip": {
+                        "type": "V4", 
+                        "addr": "192.168.38.11"
+                    }, 
+                    "enabled": true, 
+                    "port": "80"
+                }
+            ]
+        }
+    ], 
+    "SSLKeyAndCertificate": []
+}

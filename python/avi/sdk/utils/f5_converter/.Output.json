@@ -1,0 +1,326 @@
+{
+    "VirtualService": [
+        {
+            "pool_ref": "admin:F5-Pool-002:Default-Cloud", 
+            "name": "F5-VIP-443-004", 
+            "services": [
+                {
+                    "enable_ssl": true, 
+                    "port": "443"
+                }
+            ], 
+            "ip_address": {
+                "type": "V4", 
+                "addr": "192.168.38.25"
+            }, 
+            "type": "VS_TYPE_NORMAL", 
+            "application_profile_name": "System-HTTP", 
+            "enabled": true, 
+            "ssl_profile_name": "System-Standard"
+        }, 
+        {
+            "pool_ref": "admin:F5-Pool-001:Default-Cloud", 
+            "name": "F5-VIP-80-001", 
+            "services": [
+                {
+                    "enable_ssl": true, 
+                    "port": "80"
+                }
+            ], 
+            "ip_address": {
+                "type": "V4", 
+                "addr": "192.168.38.20"
+            }, 
+            "type": "VS_TYPE_NORMAL", 
+            "application_profile_name": "System-HTTP", 
+            "enabled": true, 
+            "ssl_profile_name": "System-Standard"
+        }, 
+        {
+            "pool_ref": "admin:testpool:Default-Cloud", 
+            "name": "EngVIP", 
+            "services": [
+                {
+                    "enable_ssl": true, 
+                    "port": "80"
+                }
+            ], 
+            "ip_address": {
+                "type": "V4", 
+                "addr": "172.1.1.1"
+            }, 
+            "type": "VS_TYPE_NORMAL", 
+            "application_profile_name": "System-HTTP", 
+            "enabled": true, 
+            "ssl_profile_name": "System-Standard"
+        }, 
+        {
+            "pool_ref": "admin:testpool:Default-Cloud", 
+            "name": "testvip-http-80", 
+            "services": [
+                {
+                    "enable_ssl": true, 
+                    "port": "80"
+                }
+            ], 
+            "ip_address": {
+                "type": "V4", 
+                "addr": "10.90.114.121"
+            }, 
+            "type": "VS_TYPE_NORMAL", 
+            "application_profile_name": "System-HTTP", 
+            "enabled": true, 
+            "ssl_profile_name": "System-Standard"
+        }, 
+        {
+            "pool_ref": "admin:F5-Pool-002:Default-Cloud", 
+            "name": "F5-VIP-443-001", 
+            "services": [
+                {
+                    "enable_ssl": true, 
+                    "port": "443"
+                }
+            ], 
+            "ip_address": {
+                "type": "V4", 
+                "addr": "192.168.38.21"
+            }, 
+            "type": "VS_TYPE_NORMAL", 
+            "application_profile_name": "System-HTTP", 
+            "enabled": true, 
+            "ssl_profile_name": "System-Standard"
+        }, 
+        {
+            "pool_ref": "admin:F5-Pool-004:Default-Cloud", 
+            "name": "F5-VIP-443-002", 
+            "services": [
+                {
+                    "enable_ssl": true, 
+                    "port": "443"
+                }
+            ], 
+            "ip_address": {
+                "type": "V4", 
+                "addr": "192.168.38.22"
+            }, 
+            "type": "VS_TYPE_NORMAL", 
+            "application_profile_name": "System-HTTP", 
+            "enabled": true, 
+            "ssl_profile_name": "System-Standard"
+        }, 
+        {
+            "pool_ref": "admin:testpool:Default-Cloud", 
+            "name": "testvip", 
+            "services": [
+                {
+                    "enable_ssl": true, 
+                    "port": "443"
+                }
+            ], 
+            "ip_address": {
+                "type": "V4", 
+                "addr": "10.90.114.121"
+            }, 
+            "type": "VS_TYPE_NORMAL", 
+            "application_profile_name": "System-HTTP", 
+            "enabled": true, 
+            "ssl_profile_name": "System-Standard"
+        }
+    ], 
+    "Pool": [
+        {
+            "pd_action_type": "POOL_DOWN_ACTION_CLOSE_CONN", 
+            "servers": [
+                {
+                    "ip": {
+                        "type": "V4", 
+                        "addr": "192.168.39.31"
+                    }, 
+                    "enabled": true, 
+                    "port": "80"
+                }, 
+                {
+                    "ip": {
+                        "type": "V4", 
+                        "addr": "192.168.39.30"
+                    }, 
+                    "enabled": true, 
+                    "port": "80"
+                }
+            ], 
+            "uuid": "pool-21b5117e-6c37-44fb-a1cc-f28bdfac487d", 
+            "name": "F5-Pool-002"
+        }, 
+        {
+            "pd_action_type": null, 
+            "servers": [
+                {
+                    "ip": {
+                        "type": "V4", 
+                        "addr": "10.90.115.10"
+                    }, 
+                    "enabled": true, 
+                    "port": "80"
+                }, 
+                {
+                    "ip": {
+                        "type": "V4", 
+                        "addr": "192.168.40.30"
+                    }, 
+                    "enabled": true, 
+                    "port": "80"
+                }
+            ], 
+            "uuid": "pool-946c58f9-5380-40fd-8b43-84cb1b0a525a", 
+            "name": "F5-Pool-003"
+        }, 
+        {
+            "pd_action_type": null, 
+            "servers": [
+                {
+                    "ip": {
+                        "type": "V4", 
+                        "addr": "F5-Node-Server3"
+                    }, 
+                    "enabled": true, 
+                    "port": "80"
+                }, 
+                {
+                    "ip": {
+                        "type": "V4", 
+                        "addr": "10.90.115.10"
+                    }, 
+                    "enabled": true, 
+                    "port": "80"
+                }, 
+                {
+                    "ip": {
+                        "type": "V4", 
+                        "addr": "10.90.115.11"
+                    }, 
+                    "enabled": true, 
+                    "port": "80"
+                }, 
+                {
+                    "ip": {
+                        "type": "V4", 
+                        "addr": "F5-Node-Server2"
+                    }, 
+                    "enabled": true, 
+                    "port": "80"
+                }, 
+                {
+                    "ip": {
+                        "type": "V4", 
+                        "addr": "F5-Node-Server1"
+                    }, 
+                    "enabled": false, 
+                    "port": "80"
+                }
+            ], 
+            "uuid": "pool-58766220-8584-414c-b8fc-43738aa1a2aa", 
+            "name": "F5-Pool-001"
+        }, 
+        {
+            "pd_action_type": null, 
+            "servers": [
+                {
+                    "ip": {
+                        "type": "V4", 
+                        "addr": "10.90.115.10"
+                    }, 
+                    "enabled": true, 
+                    "port": "80"
+                }, 
+                {
+                    "ip": {
+                        "type": "V4", 
+                        "addr": "10.90.115.11"
+                    }, 
+                    "enabled": true, 
+                    "port": "80"
+                }
+            ], 
+            "uuid": "pool-e1f40748-61e9-4d8c-a32b-828e02b1ec45", 
+            "name": "testpool"
+        }, 
+        {
+            "pd_action_type": null, 
+            "servers": [
+                {
+                    "ip": {
+                        "type": "V4", 
+                        "addr": "10.90.115.11"
+                    }, 
+                    "enabled": true, 
+                    "port": "443"
+                }, 
+                {
+                    "ip": {
+                        "type": "V4", 
+                        "addr": "10.90.115.10"
+                    }, 
+                    "enabled": true, 
+                    "port": "443"
+                }
+            ], 
+            "uuid": "pool-9f5f99c0-1944-468c-b8ea-35b2ed94a894", 
+            "name": "F5-Pool-004"
+        }, 
+        {
+            "pd_action_type": null, 
+            "servers": [
+                {
+                    "ip": {
+                        "type": "V4", 
+                        "addr": "10.90.115.10"
+                    }, 
+                    "enabled": true, 
+                    "port": "80"
+                }, 
+                {
+                    "ip": {
+                        "type": "V4", 
+                        "addr": "10.90.115.11"
+                    }, 
+                    "enabled": false, 
+                    "port": "80"
+                }, 
+                {
+                    "ip": {
+                        "type": "V4", 
+                        "addr": "192.168.39.30"
+                    }, 
+                    "enabled": true, 
+                    "port": "80"
+                }, 
+                {
+                    "ip": {
+                        "type": "V4", 
+                        "addr": "F5-Node-Server1"
+                    }, 
+                    "enabled": true, 
+                    "port": "80"
+                }, 
+                {
+                    "ip": {
+                        "type": "V4", 
+                        "addr": "192.168.40.30"
+                    }, 
+                    "enabled": true, 
+                    "port": "80"
+                }, 
+                {
+                    "ip": {
+                        "type": "V4", 
+                        "addr": "F5-Node-Server2"
+                    }, 
+                    "enabled": true, 
+                    "port": "80"
+                }
+            ], 
+            "uuid": "pool-cf0f2177-1bd0-493c-af1e-6cd9d2599cf6", 
+            "name": "F5-Pool-005"
+        }
+    ]
+}

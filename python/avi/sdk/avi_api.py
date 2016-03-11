@@ -22,25 +22,29 @@ class APINotImplemented(Exception):
 
 
 class ApiSession(Session):
-    '''
+    """
     Extends the Request library's session object to provide helper
     utilities to work with Avi Controller like authentication, api massaging
     etc.
-    '''
+    """
     sessionDict = {}
 
     def __init__(self, controller_ip, username, password=None, token=None,
-                 tenant=None, batch=False):
-        '''
+                 tenant=None, tenant_uuid=None):
+        """
         initialize new session object with authenticated token from login api
-        '''
+        """
         super(ApiSession, self).__init__()
         self.controller_ip = controller_ip
         self.username = username
         self.password = password
         self.keystone_token = token
-        self.tenant = tenant if tenant else 'admin'
-        self.batch = batch
+        self.tenant_uuid = tenant_uuid
+        self.tenant = None
+        if tenant:
+            self.tenant = tenant
+        elif not tenant_uuid:
+            self.tenant = "admin"
         self.headers = {}
         self.prefix = (controller_ip if controller_ip.startswith('http')
                        else "https://%s" % controller_ip)
@@ -48,20 +52,23 @@ class ApiSession(Session):
         try:
             user_session = ApiSession.sessionDict[username]["api"]
         except KeyError:
-            logger.debug("Session dose not exist creating new session for %s",
-                      username)
-            ApiSession.authenticate_session(self)
+            logger.debug("Session does not exist creating new session for %s",
+                         username)
+            self.authenticate_session()
             ApiSession.sessionDict[username] = {"api": self,
                                                 "last_used": datetime.utcnow()}
             user_session = self
         self.headers = copy.deepcopy(user_session.headers)
-        self.headers.update({"X-Avi-Tenant": "%s" % tenant})
+        if self.tenant:
+            self.headers.update({"X-Avi-Tenant": "%s" % self.tenant})
+        if self.tenant_uuid:
+            self.headers.update({"X-Avi-Tenant-UUID": "%s" % self.tenant_uuid})
         self.cookies = user_session.cookies
         return
 
     @staticmethod
     def get_session(controller_ip, username, password=None, token=None,
-                    tenant=None, batch=False):
+                    tenant=None, tenant_uuid=None):
         """
         returns the session object for same user and tenant
         calls init if session dose not exist and adds it to session cache
@@ -71,28 +78,25 @@ class ApiSession(Session):
             if user_session.password != password:
                 raise APIError("Authentication Failed")
             if user_session.tenant != tenant:
-                raise APIError("Tenant wont match use ApiSessionAdapter")
+                raise APIError("Tenant doesn't match; use ApiSessionAdapter")
         except KeyError:
             logger.debug("Session dose not exist creating new session for %s",
                          username)
             user_session = ApiSession(controller_ip, username, password,
-                                      token=token, tenant=tenant, batch=batch)
+                                      token=token, tenant=tenant,
+                                      tenant_uuid=tenant_uuid)
             ApiSession.sessionDict[user_session.username] = \
                 {"api": user_session, "last_used": datetime.utcnow()}
         ApiSession._clean_inactive_sessions()
         return user_session
-
 
     def reset_session(self):
         """
         @param api: ApiSession object
         """
         logger.info('resetting session for %s', self.username)
-        sess = ApiSession.sessionDict.get(self.username)["api"]
-        if sess.headers.get("X-CSRFToken") == self.headers.get("X-CSRFToken"):
-            del ApiSession.sessionDict[self.username]
-            print "Removed session for: " + self.username
-        ApiSession._setup_session(self)
+        self.headers = {}
+        self.authenticate_session()
         ApiSession._clean_inactive_sessions()
 
     def authenticate_session(self):
@@ -103,8 +107,8 @@ class ApiSession(Session):
             body["token"] = self.keystone_token
 
         logger.debug('authenticating user %s ', self.username)
-        rsp = super(ApiSession, self).post(self.prefix+"/login", body, timeout=5,
-                                       verify=False)
+        rsp = super(ApiSession, self).post(self.prefix+"/login", body,
+                                           timeout=5, verify=False)
         if rsp.status_code != 200:
             raise Exception("Authentication failed: %s", rsp.text)
         logger.debug("rsp cookies: %s", dict(rsp.cookies))
@@ -116,6 +120,8 @@ class ApiSession(Session):
         # switch to a different tenant if needed
         if self.tenant:
             self.headers.update({"X-Avi-Tenant": "%s" % self.tenant})
+        elif self.tenant_uuid:
+            self.headers.update({"X-Avi-Tenant-UUID": "%s" % self.tenant_uuid})
         logger.debug("authentication success sess headers: %s", self.headers)
         return
 
@@ -123,9 +129,10 @@ class ApiSession(Session):
         """get method takes relative path to service and kwargs as per Session
             class get method
         returns session's response object """
-        path = self._get_api_path(path)
+        if not path.startswith(self.prefix):
+            path = self._get_api_path(path)
         resp = super(ApiSession, self).get(path, timeout=20, verify=False,
-                                       **kwargs)
+                                           **kwargs)
         if resp.status_code in (401, 419):
             ApiSession.reset_session(self)
             resp = self.get(path, **kwargs)
@@ -136,31 +143,33 @@ class ApiSession(Session):
         """get_by_name method takes relative path to service as well as name
             and adds name to query param
         returns session's response object"""
-        pool_obj = None
-        path = self._get_api_path(path)
+        obj = None
+        if not path.startswith(self.prefix):
+            path = self._get_api_path(path)
         params = kwargs.get('params', {})
         params.update({'name': name})
         resp = super(ApiSession, self).get(path, params=params, timeout=20,
-                                       verify=False, **kwargs)
+                                           verify=False, **kwargs)
         if resp.status_code in (401, 419):
             ApiSession.reset_session(self)
             resp = self.get_object_by_name(path, name, **kwargs)
         if resp.status_code > 299:
-            return pool_obj
+            return obj
         try:
-            pool_obj = json.loads(resp.text)['results'][0]
+            obj = json.loads(resp.text)['results'][0]
         except IndexError:
-            pool_obj = None
+            obj = None
         self._update_session_last_used()
-        return pool_obj
+        return obj
 
     def post(self, path, data=None, json_data=None, **kwargs):
         """post accepts relative path to service and data,json and kwargs as
             per session class post method
         returns session's response object"""
-        path = self._get_api_path(path)
+        if not path.startswith(self.prefix):
+            path = self._get_api_path(path)
         resp = super(ApiSession, self).post(path, data=data, json=json_data,
-                                        **kwargs)
+                                            **kwargs)
         if resp.status_code in (401, 419):
             ApiSession.reset_session(self)
             resp = self.post(path, data, json_data, **kwargs)
@@ -171,7 +180,8 @@ class ApiSession(Session):
         """put accepts relative path to service with uuid data and kwargs as
             per session class put method
         returns session's response object"""
-        path = self._get_api_path(path)
+        if not path.startswith(self.prefix):
+            path = self._get_api_path(path)
         resp = super(ApiSession, self).put(path, data=data, **kwargs)
         if resp.status_code in (401, 419):
             ApiSession.reset_session(self)
@@ -184,7 +194,8 @@ class ApiSession(Session):
             getting it from name
         returns session's response object"""
         uuid = self._get_uuid_by_name(path, name)
-        path = self._get_api_path(path, uuid)
+        if not path.startswith(self.prefix):
+            path = self._get_api_path(path, uuid)
         resp = super(ApiSession, self).put(path, data=data, **kwargs)
         if resp.status_code in (401, 419):
             ApiSession.reset_session(self)
@@ -196,7 +207,8 @@ class ApiSession(Session):
         """delete accepts relative path to service with uuid data kwargs as per
             session class delete method
         returns session's response object"""
-        path = self._get_api_path(path)
+        if not path.startswith(self.prefix):
+            path = self._get_api_path(path)
         resp = super(ApiSession, self).delete(path, **kwargs)
         if resp.status_code in (401, 419):
             ApiSession.reset_session(self)
@@ -209,7 +221,8 @@ class ApiSession(Session):
             by getting it from name
         returns session's response object"""
         uuid = self._get_uuid_by_name(path, name)
-        path = self._get_api_path(path, uuid)
+        if not path.startswith(self.prefix):
+            path = self._get_api_path(path, uuid)
         resp = super(ApiSession, self).delete(path, **kwargs)
         if resp.status_code in (401, 419):
             ApiSession.reset_session(self)
@@ -253,6 +266,8 @@ class ApiSession(Session):
     def _get_uuid_by_name(self, path, name):
         """gets object by name and service path and returns uuid"""
         resp = self.get_object_by_name(path, name)
+        if not resp:
+            raise ObjectNotFound("%s/%s" % (path, name))
         return self.get_obj_uuid(resp)
 
     def _update_session_last_used(self):
@@ -274,8 +289,8 @@ class ApiSessionAdapter:
     adapter_args = {}
     api = None
 
-    def __init__(self, api, tenant=None, headers=None, cookies=None,
-                 hooks=None):
+    def __init__(self, api, tenant=None, tenant_uuid=None, headers=None,
+                 cookies=None, hooks=None):
         self.api = api
         if headers:
             new_headers = copy.deepcopy(api.headers)
@@ -289,6 +304,8 @@ class ApiSessionAdapter:
             self.adapter_args["hooks"] = hooks
         if tenant:
             self.adapter_args["headers"].update({"X-Avi-Tenant": "%s" % tenant})
+        elif tenant_uuid:
+            self.adapter_args["headers"].update({"X-Avi-Tenant-UUID": "%s" % tenant})
         return
 
     def get(self, path, **kwargs):
