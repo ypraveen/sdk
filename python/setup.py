@@ -26,7 +26,9 @@ setup(
         'Topic :: Internet :: WWW/HTTP',
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
     ],
+    include_package_data=True,
     install_requires = ['requests', 'pyyaml'],
-    
+    package_data={'avi': ['*.cfg', '*.conf', '*.crt', '*.json', '*.key',
+                          '*.pem', '*.xml', '*.yaml']},
 )
 
