@@ -1,8 +1,8 @@
 #!/bin/bash
 set -x
 assets=""
-REL=latest
-BRANCH=master
+REL=16.1
+BRANCH=$REL
 git tag -d $REL
 git tag $REL
 git push -f origin $REL
