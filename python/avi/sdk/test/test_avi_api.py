@@ -2,16 +2,16 @@ import json
 import logging
 import unittest
 import time
-from avi.sdk.avi_api import ApiSession
+from avi.sdk.avi_api import ApiSession, ObjectNotFound, APIError
 from avi.sdk.utils.api_utils import ApiUtils
 from avi.sdk.samples.common import get_sample_ssl_params
 from requests.packages import urllib3
+import copy
 
 gSAMPLE_CONFIG = None
 api = None
 log = logging.getLogger(__name__)
-
-
+login_info = None
 
 
 def setUpModule():
@@ -21,7 +21,9 @@ def setUpModule():
     gSAMPLE_CONFIG = json.loads(cfg)
     log.debug(' read cofig %s', gSAMPLE_CONFIG)
 
+    global login_info
     login_info = gSAMPLE_CONFIG["LoginInfo"]
+
     global api
     api = ApiSession.get_session(login_info["controller_ip"],
                                 login_info.get("username", "admin"),
@@ -96,6 +98,60 @@ class Test(unittest.TestCase):
         resp = api.delete("virtualservice/"+vs_obj["uuid"])
         resp2 = api.delete("pool/"+pool_obj["uuid"])
         assert resp.status_code < 300 and resp2.status_code < 300
+
+    def test_resp_obj_not_found(self):
+        api = ApiSession.get_session(
+                login_info["controller_ip"],
+                login_info.get("username", "admin"),
+                login_info.get("password", "avi123"),
+                tenant=login_info.get("tenant", "admin"),
+                tenant_uuid=login_info.get("tenant_uuid", None))
+        try:
+            rsp = api.get('virtualservice/%s' % ('virtualservice-fake'))
+            rsp.obj()
+        except ObjectNotFound:
+            pass
+        else:
+            assert False
+
+    def test_resp_obj_api_error(self):
+        api = ApiSession.get_session(
+                login_info["controller_ip"],
+                login_info.get("username", "admin"),
+                login_info.get("password", "avi123"),
+                tenant=login_info.get("tenant", "admin"),
+                tenant_uuid=login_info.get("tenant_uuid", None))
+        try:
+            rsp = api.get('analytics/metrics/virtualservice/?metric_id=blah')
+            rsp.obj()
+        except APIError:
+            pass
+        except Exception as e:
+            print str(e)
+            assert False
+        else:
+            print rsp
+            assert False
+
+    def test_resp_obj(self):
+        basic_vs_cfg = copy.deepcopy(gSAMPLE_CONFIG["BasicVS"])
+        basic_pool_obj = basic_vs_cfg["pool_obj"]
+        basic_pool_obj['name'] = 'vs-pool-test_resp_obj'
+        resp = api.post('pool', data=json.dumps(basic_pool_obj))
+        assert resp.obj()
+        vs_obj = basic_vs_cfg["vs_obj"]
+        vs_obj['name'] = 'vs-test_resp_obj'
+        vs_obj["pool_ref"] = api.get_obj_ref(resp)
+        resp = api.post('virtualservice', data=json.dumps(vs_obj))
+        assert resp.status_code < 300
+        assert resp.obj()
+        vs_obj_resp = resp.obj()
+        assert vs_obj_resp['name'] == vs_obj['name']
+        resp = api.delete_by_name('virtualservice', 'vs-test_resp_obj')
+        assert resp.status_code < 299
+        resp = api.delete_by_name('pool', 'vs-pool-test_resp_obj')
+        assert resp.status_code < 299
+
 
 
 if __name__ == "__main__":
