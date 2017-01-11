@@ -162,6 +162,7 @@ class ApiSession(Session):
         self.verify = verify
         self.port = port
         self.key = controller_ip + ":" + username
+        self.login_response = dict()
 
         # Refer Notes 01 and 02
         if controller_ip.startswith('http'):
@@ -177,6 +178,7 @@ class ApiSession(Session):
         self.timeout = timeout
         try:
             user_session = ApiSession.sessionDict[self.key]["api"]
+            self.login_response = user_session.login_response
         except KeyError:
             logger.debug("Session does not exist; Creating new session for %s",
                          self.key)
@@ -276,6 +278,7 @@ class ApiSession(Session):
                 cached_api = \
                     ApiSession.sessionDict[self.key]['api']
                 cached_api.headers.update({"X-CSRFToken": csrftoken})
+        self.login_response = rsp.json()
         logger.debug("authentication success for user %s with headers: %s",
                      self.username, self.headers)
         return
